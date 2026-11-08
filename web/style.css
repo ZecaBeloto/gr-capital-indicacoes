@@ -3,7 +3,18 @@
 .img-side {
   flex: 1; position: sticky; top: 0; height: 100vh; align-self: flex-start;
   background:
-    linear-gradient(90deg, var(--navy) 0%, rgba(6, 21, 44, .85) 12%, rgba(6, 21, 44, .4) 35%, rgba(6, 21, 44, 0) 70%),
+    linear-gradient(
+      90deg,
+      var(--navy) 0%,
+      rgba(6, 21, 44, .97) 8%,
+      rgba(6, 21, 44, .88) 16%,
+      rgba(6, 21, 44, .72) 26%,
+      rgba(6, 21, 44, .52) 38%,
+      rgba(6, 21, 44, .32) 52%,
+      rgba(6, 21, 44, .16) 68%,
+      rgba(6, 21, 44, .05) 84%,
+      rgba(6, 21, 44, 0) 100%
+    ),
     linear-gradient(to bottom, var(--navy) 0%, rgba(6, 21, 44, 0) 18%, rgba(6, 21, 44, 0) 82%, var(--navy) 100%),
     url('../shared/assets/hero.jpg') center / cover;
   filter: saturate(.75) brightness(.6);
