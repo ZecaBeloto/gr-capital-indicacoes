@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel de Indicações | GR Capital</title>
+  <link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+  <header class="brand">
+    <div class="eyebrow">GR Capital</div>
+    <h1>Painel de Indicações</h1>
+  </header>
+
+  <main class="page">
+    <section id="login">
+      <label for="senha">Senha</label>
+      <input type="password" id="senha" autocomplete="current-password">
+      <div style="margin-top: 16px;">
+        <button type="button" id="entrar-btn" class="primary">Entrar</button>
+      </div>
+      <div id="login-feedback" class="feedback" role="status"></div>
+    </section>
+
+    <section id="dashboard" hidden>
+      <div class="toolbar">
+        <button type="button" id="exportar-btn" class="secondary">Baixar .xlsx</button>
+        <button type="button" id="sair-btn" class="link">Sair</button>
+      </div>
+      <div id="grupos"></div>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="../shared/logic.js"></script>
+  <script src="config.js"></script>
+  <script src="painel.js"></script>
+</body>
+</html>
