@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Indicação de Contato | GR Capital</title>
+  <link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+  <header class="brand">
+    <div class="eyebrow">GR Capital · BTG Pactual</div>
+    <h1>Indique um contato</h1>
+  </header>
+
+  <main class="page">
+    <form id="indicacao-form">
+      <label for="indicador">Seu nome</label>
+      <input type="text" id="indicador" name="indicador" autocomplete="name" placeholder="Como você se chama?">
+
+      <div id="contatos"></div>
+
+      <button type="button" id="add-contato" class="secondary" style="margin-top: 8px;">+ Adicionar contato</button>
+
+      <div style="margin-top: 24px;">
+        <button type="submit" id="submit-btn" class="primary">Enviar indicação</button>
+      </div>
+
+      <div id="feedback" role="status"></div>
+    </form>
+
+    <p class="disclaimer">
+      Os dados informados (nome e telefone) serão usados apenas para que a GR Capital
+      possa entrar em contato com a pessoa indicada. Rentabilidade passada não representa
+      garantia de rentabilidade futura.
+    </p>
+  </main>
+
+  <template id="contato-row-template">
+    <div class="contato-row">
+      <div>
+        <label>Nome do contato</label>
+        <input type="text" class="contato-nome" placeholder="Nome">
+      </div>
+      <div>
+        <label>Telefone</label>
+        <input type="tel" class="contato-telefone" placeholder="(11) 99999-0000">
+      </div>
+      <button type="button" class="link remove-contato" aria-label="Remover contato">Remover</button>
+    </div>
+  </template>
+
+  <script src="../shared/logic.js"></script>
+  <script src="config.js"></script>
+  <script src="form.js"></script>
+</body>
+</html>
