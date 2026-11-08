@@ -7,11 +7,11 @@
 .img-photo {
   position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; display: block;
-  filter: saturate(.75) brightness(.6);
+  filter: saturate(.9) brightness(.78);
 }
 .img-fade {
   position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(90deg, var(--navy) 0%, var(--navy) 18%, rgba(6, 21, 44, .88) 36%, rgba(6, 21, 44, .45) 58%, transparent 90%);
+  background: linear-gradient(90deg, var(--navy) 0%, var(--navy) 18%, rgba(6, 21, 44, .82) 36%, rgba(6, 21, 44, .32) 58%, transparent 85%);
 }
 .img-fade-v {
   position: absolute; inset: 0; pointer-events: none;
