@@ -2,7 +2,10 @@
 .form-side { flex: 1.4; min-width: 0; padding: 48px 56px 64px; max-width: 760px; }
 .img-side {
   flex: 1; position: sticky; top: 0; height: 100vh; align-self: flex-start;
-  background: linear-gradient(90deg, var(--navy) 0%, rgba(6, 21, 44, .35) 55%), url('../shared/assets/hero.jpg') center / cover;
+  background:
+    linear-gradient(90deg, var(--navy) 0%, rgba(6, 21, 44, 0) 45%),
+    linear-gradient(to bottom, var(--navy) 0%, rgba(6, 21, 44, 0) 18%, rgba(6, 21, 44, 0) 82%, var(--navy) 100%),
+    url('../shared/assets/hero.jpg') center / cover;
   filter: saturate(.75) brightness(.6);
 }
 

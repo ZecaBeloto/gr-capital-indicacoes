@@ -20,7 +20,7 @@ body { font-size: 15px; line-height: 1.5; }
 [hidden] { display: none !important; }
 
 .top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 32px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
-.logo { height: 40px; width: auto; }
+.logo { height: 58px; width: auto; }
 
 .kicker { font-size: 11px; letter-spacing: .26em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
 h1 { font-size: clamp(26px, 3.4vw, 36px); font-weight: 700; line-height: 1.2; margin-bottom: 12px; }
@@ -66,5 +66,5 @@ button:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 2px
 
 @media (max-width: 767px) {
   .top { padding: 12px 16px; }
-  .logo { height: 32px; }
+  .logo { height: 44px; }
 }
