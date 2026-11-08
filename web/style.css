@@ -1,0 +1,12 @@
+.layout { display: flex; min-height: calc(100vh - 70px); }
+.form-side { flex: 1.4; min-width: 0; padding: 48px 56px 64px; max-width: 760px; }
+.img-side {
+  flex: 1; position: sticky; top: 0; height: 100vh; align-self: flex-start;
+  background: linear-gradient(90deg, var(--navy) 0%, rgba(6, 21, 44, .35) 55%), url('../shared/assets/hero.jpg') center / cover;
+  filter: saturate(.75) brightness(.6);
+}
+
+@media (max-width: 860px) {
+  .img-side { display: none; }
+  .form-side { padding: 28px 18px 48px; max-width: none; }
+}

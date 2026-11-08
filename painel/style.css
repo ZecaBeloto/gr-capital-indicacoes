@@ -1,0 +1,29 @@
+.login { max-width: 420px; margin: 0 auto; padding: 72px 16px; }
+.dashboard { padding: 24px 32px 56px; max-width: 1100px; margin: 0 auto; }
+
+.toolbar { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 28px; }
+
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.kpi { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; }
+.kpi-label { font-size: 12px; color: var(--muted); }
+.kpi-value { font-size: 26px; font-weight: 700; margin-top: 4px; }
+
+.grupo { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 16px 20px; margin-bottom: 14px; }
+.grupo h3 { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+.grupo .data { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+
+.contato-item { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 0; border-top: 1px solid var(--line); }
+.contato-item:first-of-type { border-top: none; }
+.contato-item .info { min-width: 0; }
+.contato-item .nome { font-weight: 500; }
+.contato-item .telefone { color: var(--muted); font-size: 13px; }
+
+select.status { width: auto; min-width: 140px; flex: none; }
+
+.empty-state { text-align: center; color: var(--muted); padding: 64px 16px; }
+
+@media (max-width: 767px) {
+  .dashboard { padding: 16px 16px 40px; }
+  .toolbar { justify-content: flex-start; flex-wrap: wrap; }
+  .contato-item { flex-wrap: wrap; }
+}

@@ -5,6 +5,7 @@
   const entrarBtn = document.getElementById('entrar-btn');
   const loginFeedback = document.getElementById('login-feedback');
   const gruposEl = document.getElementById('grupos');
+  const kpisEl = document.getElementById('kpis');
   const exportarBtn = document.getElementById('exportar-btn');
   const sairBtn = document.getElementById('sair-btn');
 
@@ -28,8 +29,34 @@
     if (row) row.status = status;
   }
 
+  function renderKpis(rows) {
+    const total = rows.length;
+    const contatados = rows.filter((r) => r.status === GRIndicacoes.STATUS.CONTATADO).length;
+    const pendentes = total - contatados;
+
+    kpisEl.innerHTML = '';
+    [
+      { label: 'Total de indicações', value: total },
+      { label: 'Pendentes', value: pendentes },
+      { label: 'Contatados', value: contatados },
+    ].forEach(({ label, value }) => {
+      const kpi = document.createElement('div');
+      kpi.className = 'kpi';
+      const kpiLabel = document.createElement('div');
+      kpiLabel.className = 'kpi-label';
+      kpiLabel.textContent = label;
+      const kpiValue = document.createElement('div');
+      kpiValue.className = 'kpi-value';
+      kpiValue.textContent = String(value);
+      kpi.appendChild(kpiLabel);
+      kpi.appendChild(kpiValue);
+      kpisEl.appendChild(kpi);
+    });
+  }
+
   function renderGrupos(rows) {
     currentRows = rows;
+    renderKpis(rows);
     const grupos = GRIndicacoes.groupByIndicadorEData(rows);
 
     if (grupos.length === 0) {
@@ -56,7 +83,15 @@
         item.className = 'contato-item';
 
         const info = document.createElement('div');
-        info.textContent = `${contato.nome} · ${contato.telefone}`;
+        info.className = 'info';
+        const nomeEl = document.createElement('div');
+        nomeEl.className = 'nome';
+        nomeEl.textContent = contato.nome;
+        const telefoneEl = document.createElement('div');
+        telefoneEl.className = 'telefone';
+        telefoneEl.textContent = contato.telefone;
+        info.appendChild(nomeEl);
+        info.appendChild(telefoneEl);
         item.appendChild(info);
 
         const select = document.createElement('select');

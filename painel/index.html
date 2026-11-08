@@ -3,32 +3,36 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
   <title>Painel de Indicações | GR Capital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="../shared/styles.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="brand">
-    <div class="eyebrow">GR Capital</div>
-    <h1>Painel de Indicações</h1>
+  <header class="top">
+    <img class="logo" src="../shared/assets/logo.png" alt="GR Capital">
   </header>
 
-  <main class="page">
-    <section id="login">
-      <label for="senha">Senha</label>
-      <input type="password" id="senha" autocomplete="current-password">
-      <div style="margin-top: 16px;">
-        <button type="button" id="entrar-btn" class="primary">Entrar</button>
-      </div>
-      <div id="login-feedback" class="feedback" role="status"></div>
-    </section>
+  <main id="login" class="login">
+    <div class="kicker">GR Capital</div>
+    <h1>Painel de <span>Indicações</span></h1>
+    <p class="intro">Acompanhamento dos contatos indicados pelos seus clientes.</p>
+    <label for="senha">Senha</label>
+    <input type="password" id="senha" autocomplete="current-password">
+    <div style="margin-top: 20px;">
+      <button type="button" id="entrar-btn" class="primary">Entrar</button>
+    </div>
+    <div id="login-feedback" class="feedback" role="status"></div>
+  </main>
 
-    <section id="dashboard" hidden>
-      <div class="toolbar">
-        <button type="button" id="exportar-btn" class="secondary">Baixar .xlsx</button>
-        <button type="button" id="sair-btn" class="link">Sair</button>
-      </div>
-      <div id="grupos"></div>
-    </section>
+  <main id="dashboard" class="dashboard" hidden>
+    <div class="toolbar">
+      <button type="button" id="exportar-btn" class="secondary">Baixar .xlsx</button>
+      <button type="button" id="sair-btn" class="ghost">Sair</button>
+    </div>
+    <div class="kpis" id="kpis"></div>
+    <div id="grupos"></div>
   </main>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
