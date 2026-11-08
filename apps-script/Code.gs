@@ -7,8 +7,23 @@ var STATUS_CONTATADO = 'contatado';
 var MAX_ATTEMPTS = 20;
 var LOCK_MINUTES = 10;
 
+function getSpreadsheet_() {
+  var props = PropertiesService.getScriptProperties();
+  var id = props.getProperty('SPREADSHEET_ID');
+  var ss;
+
+  if (id) {
+    ss = SpreadsheetApp.openById(id);
+  } else {
+    ss = SpreadsheetApp.create('Respostas | Indicações GR Capital');
+    props.setProperty('SPREADSHEET_ID', ss.getId());
+  }
+
+  return ss;
+}
+
 function getSheet_() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = getSpreadsheet_();
   var sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
@@ -21,7 +36,7 @@ function setup() {
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(['Id', 'Timestamp', 'Indicador', 'ContatoNome', 'ContatoTelefone', 'Status']);
   }
-  Logger.log('Planilha pronta: ' + SpreadsheetApp.getActiveSpreadsheet().getUrl());
+  Logger.log('Planilha pronta: ' + getSpreadsheet_().getUrl());
 }
 
 function jsonOutput_(obj) {
