@@ -110,11 +110,30 @@ function listRows_() {
   return rows;
 }
 
+function escapeForSheet_(value) {
+  // Previne CSV/fórmula injection: um valor começando com = + - @ é
+  // avaliado pelo Sheets como fórmula mesmo com a coluna formatada como
+  // texto. Prefixar com aspas simples força interpretação literal (o
+  // próprio Sheets remove essa aspa ao armazenar o valor).
+  var str = String(value);
+  if (/^[=+\-@\t\r]/.test(str)) {
+    return "'" + str;
+  }
+  return str;
+}
+
 function appendIndicacao_(indicador, contatos) {
   var sheet = getSheet_();
   var timestamp = new Date().toISOString();
   var rows = contatos.map(function (contato) {
-    return [Utilities.getUuid(), timestamp, indicador, contato.nome, contato.telefone, STATUS_PENDENTE];
+    return [
+      Utilities.getUuid(),
+      timestamp,
+      escapeForSheet_(indicador),
+      escapeForSheet_(contato.nome),
+      escapeForSheet_(contato.telefone),
+      STATUS_PENDENTE,
+    ];
   });
   sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, 6).setValues(rows);
 }
