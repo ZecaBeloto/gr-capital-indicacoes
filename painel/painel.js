@@ -16,9 +16,16 @@
   }
 
   async function fetchRows(senha) {
-    const url = `${WEB_APP_URL}?action=list&senha=${encodeURIComponent(senha)}`;
-    const response = await fetch(url);
+    const response = await fetch(WEB_APP_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'list', senha }),
+    });
     return response.json();
+  }
+
+  function setCurrentRowStatus_(id, status) {
+    const row = currentRows.find((r) => r.id === id);
+    if (row) row.status = status;
   }
 
   function renderGrupos(rows) {
@@ -66,6 +73,7 @@
           const previous = contato.status;
           const next = select.value;
           contato.status = next;
+          setCurrentRowStatus_(contato.id, next);
 
           try {
             const senha = sessionStorage.getItem('senha');
@@ -77,10 +85,12 @@
             if (!data.ok) {
               select.value = previous;
               contato.status = previous;
+              setCurrentRowStatus_(contato.id, previous);
             }
           } catch (err) {
             select.value = previous;
             contato.status = previous;
+            setCurrentRowStatus_(contato.id, previous);
           }
         });
 

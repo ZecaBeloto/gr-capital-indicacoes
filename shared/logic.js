@@ -3,8 +3,10 @@ const STATUS = {
   CONTATADO: 'contatado',
 };
 
+const MAX_CONTATOS = 20;
+
 function formatDateKey(isoTimestamp) {
-  return String(isoTimestamp).slice(0, 10);
+  return new Date(isoTimestamp).toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
 }
 
 function validateIndicacaoPayload({ indicador, contatos }) {
@@ -16,6 +18,8 @@ function validateIndicacaoPayload({ indicador, contatos }) {
 
   if (!Array.isArray(contatos) || contatos.length === 0) {
     errors.push('Adicione ao menos um contato indicado.');
+  } else if (contatos.length > MAX_CONTATOS) {
+    errors.push(`Máximo de ${MAX_CONTATOS} contatos por envio.`);
   } else {
     contatos.forEach((contato, index) => {
       if (!contato.nome || !String(contato.nome).trim()) {

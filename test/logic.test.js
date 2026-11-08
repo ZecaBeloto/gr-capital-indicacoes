@@ -6,6 +6,11 @@ test('formatDateKey extracts YYYY-MM-DD from an ISO timestamp', () => {
   assert.equal(formatDateKey('2026-11-08T17:45:00.000Z'), '2026-11-08');
 });
 
+test('formatDateKey uses the São Paulo local date, not the UTC date', () => {
+  // 2026-11-09T01:30:00.000Z is 2026-11-08T22:30:00 in America/Sao_Paulo (UTC-3)
+  assert.equal(formatDateKey('2026-11-09T01:30:00.000Z'), '2026-11-08');
+});
+
 test('validateIndicacaoPayload rejects blank indicador', () => {
   const result = validateIndicacaoPayload({ indicador: '   ', contatos: [{ nome: 'Ana', telefone: '11999990000' }] });
   assert.equal(result.valid, false);
@@ -19,6 +24,12 @@ test('validateIndicacaoPayload rejects a contato with blank nome or telefone', (
 
 test('validateIndicacaoPayload rejects zero contatos', () => {
   const result = validateIndicacaoPayload({ indicador: 'Carlos', contatos: [] });
+  assert.equal(result.valid, false);
+});
+
+test('validateIndicacaoPayload rejects more than 20 contatos', () => {
+  const contatos = Array.from({ length: 21 }, (_, i) => ({ nome: `Nome ${i}`, telefone: '11999990000' }));
+  const result = validateIndicacaoPayload({ indicador: 'Carlos', contatos });
   assert.equal(result.valid, false);
 });
 
@@ -40,6 +51,12 @@ test('groupByIndicadorEData groups rows by date then indicador, sorted desc/asc'
 
 test('groupByIndicadorEData returns an empty array for no rows', () => {
   assert.deepEqual(groupByIndicadorEData([]), []);
+});
+
+test('rowsToXlsxData keeps a +55 international phone number intact', () => {
+  const rows = [{ indicador: 'Bruna', contatoNome: 'Ana', contatoTelefone: '+55 (11) 99999-0000', status: STATUS.PENDENTE, timestamp: '2026-11-08T10:00:00.000Z' }];
+  const data = rowsToXlsxData(rows);
+  assert.equal(data[1][2], '+55 (11) 99999-0000');
 });
 
 test('rowsToXlsxData produces a header row plus one row per contact', () => {

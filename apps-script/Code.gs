@@ -6,6 +6,8 @@ var STATUS_PENDENTE = 'pendente';
 var STATUS_CONTATADO = 'contatado';
 var MAX_ATTEMPTS = 20;
 var LOCK_MINUTES = 10;
+var MAX_CONTATOS = 20;
+var MAX_FIELD_LEN = 200;
 
 function getSpreadsheet_() {
   var props = PropertiesService.getScriptProperties();
@@ -22,17 +24,26 @@ function getSpreadsheet_() {
   return ss;
 }
 
+function formatColumnsAsText_(sheet) {
+  // Força colunas A:F como texto simples, para que Sheets nunca converta
+  // telefones em número/data nem interprete valores começados com "=" como
+  // fórmula (entrada vinda de um formulário público).
+  sheet.getRange('A:F').setNumberFormat('@');
+}
+
 function getSheet_() {
   var ss = getSpreadsheet_();
   var sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
+    formatColumnsAsText_(sheet);
   }
   return sheet;
 }
 
 function setup() {
   var sheet = getSheet_();
+  formatColumnsAsText_(sheet);
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(['Id', 'Timestamp', 'Indicador', 'ContatoNome', 'ContatoTelefone', 'Status']);
   }
@@ -46,27 +57,39 @@ function jsonOutput_(obj) {
 function checkSenha_(senha) {
   var props = PropertiesService.getScriptProperties();
   var painelSenha = props.getProperty('PAINEL_SENHA');
-  var lockedUntil = props.getProperty('LOCKED_UNTIL');
-  var now = new Date();
 
-  if (lockedUntil && new Date(lockedUntil) > now) {
-    return { ok: false, error: 'Bloqueado, tente novamente mais tarde.', lockedUntil: lockedUntil };
+  if (!painelSenha) {
+    return { ok: false, error: 'Painel não configurado. Defina PAINEL_SENHA nas Propriedades do script.' };
   }
 
-  if (senha !== painelSenha) {
-    var attempts = parseInt(props.getProperty('FAILED_ATTEMPTS') || '0', 10) + 1;
-    if (attempts >= MAX_ATTEMPTS) {
-      var until = new Date(now.getTime() + LOCK_MINUTES * 60 * 1000);
-      props.setProperty('LOCKED_UNTIL', until.toISOString());
-      props.setProperty('FAILED_ATTEMPTS', '0');
-    } else {
-      props.setProperty('FAILED_ATTEMPTS', String(attempts));
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+
+  try {
+    var lockedUntil = props.getProperty('LOCKED_UNTIL');
+    var now = new Date();
+
+    if (lockedUntil && new Date(lockedUntil) > now) {
+      return { ok: false, error: 'Bloqueado, tente novamente mais tarde.', lockedUntil: lockedUntil };
     }
-    return { ok: false, error: 'Senha incorreta.' };
-  }
 
-  props.setProperty('FAILED_ATTEMPTS', '0');
-  return { ok: true };
+    if (typeof senha !== 'string' || senha !== painelSenha) {
+      var attempts = parseInt(props.getProperty('FAILED_ATTEMPTS') || '0', 10) + 1;
+      if (attempts >= MAX_ATTEMPTS) {
+        var until = new Date(now.getTime() + LOCK_MINUTES * 60 * 1000);
+        props.setProperty('LOCKED_UNTIL', until.toISOString());
+        props.setProperty('FAILED_ATTEMPTS', '0');
+        return { ok: false, error: 'Bloqueado, tente novamente mais tarde.', lockedUntil: until.toISOString() };
+      }
+      props.setProperty('FAILED_ATTEMPTS', String(attempts));
+      return { ok: false, error: 'Senha incorreta.' };
+    }
+
+    props.setProperty('FAILED_ATTEMPTS', '0');
+    return { ok: true };
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 function listRows_() {
@@ -89,16 +112,11 @@ function listRows_() {
 
 function appendIndicacao_(indicador, contatos) {
   var sheet = getSheet_();
-  contatos.forEach(function (contato) {
-    sheet.appendRow([
-      Utilities.getUuid(),
-      new Date().toISOString(),
-      indicador,
-      contato.nome,
-      contato.telefone,
-      STATUS_PENDENTE,
-    ]);
+  var timestamp = new Date().toISOString();
+  var rows = contatos.map(function (contato) {
+    return [Utilities.getUuid(), timestamp, indicador, contato.nome, contato.telefone, STATUS_PENDENTE];
   });
+  sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, 6).setValues(rows);
 }
 
 function updateStatus_(id, status) {
@@ -116,44 +134,66 @@ function updateStatus_(id, status) {
   return { ok: false, error: 'indicação não encontrada' };
 }
 
-function doGet(e) {
-  var action = e.parameter.action;
-
-  if (action === 'list') {
-    var check = checkSenha_(e.parameter.senha);
-    if (!check.ok) return jsonOutput_(check);
-    return jsonOutput_({ ok: true, rows: listRows_() });
+function validateSubmit_(indicador, contatos) {
+  if (!indicador || !String(indicador).trim()) {
+    return 'Informe quem está indicando.';
   }
+  if (!Array.isArray(contatos) || contatos.length === 0) {
+    return 'Adicione ao menos um contato indicado.';
+  }
+  if (contatos.length > MAX_CONTATOS) {
+    return 'Número de contatos acima do permitido.';
+  }
+  if (String(indicador).length > MAX_FIELD_LEN) {
+    return 'Nome de quem indica muito longo.';
+  }
+  for (var i = 0; i < contatos.length; i++) {
+    var nome = contatos[i].nome;
+    var telefone = contatos[i].telefone;
+    if (!nome || !String(nome).trim() || !telefone || !String(telefone).trim()) {
+      return 'Preencha nome e telefone de todos os contatos.';
+    }
+    if (String(nome).length > MAX_FIELD_LEN || String(telefone).length > MAX_FIELD_LEN) {
+      return 'Campo de contato muito longo.';
+    }
+  }
+  return null;
+}
 
+function doGet(e) {
   return jsonOutput_({ ok: false, error: 'ação desconhecida' });
 }
 
 function doPost(e) {
-  var body = JSON.parse(e.postData.contents);
+  var body;
+  try {
+    body = JSON.parse(e.postData.contents);
+  } catch (err) {
+    return jsonOutput_({ ok: false, error: 'corpo da requisição inválido' });
+  }
 
   if (body.action === 'submit') {
     var indicador = body.indicador;
     var contatos = body.contatos || [];
 
-    if (!indicador || !String(indicador).trim()) {
-      return jsonOutput_({ ok: false, error: 'Informe quem está indicando.' });
-    }
-    if (contatos.length === 0) {
-      return jsonOutput_({ ok: false, error: 'Adicione ao menos um contato indicado.' });
-    }
-    for (var i = 0; i < contatos.length; i++) {
-      if (!contatos[i].nome || !String(contatos[i].nome).trim() || !contatos[i].telefone || !String(contatos[i].telefone).trim()) {
-        return jsonOutput_({ ok: false, error: 'Preencha nome e telefone de todos os contatos.' });
-      }
+    var validationError = validateSubmit_(indicador, contatos);
+    if (validationError) {
+      return jsonOutput_({ ok: false, error: validationError });
     }
 
     appendIndicacao_(indicador, contatos);
     return jsonOutput_({ ok: true });
   }
 
+  if (body.action === 'list') {
+    var checkList = checkSenha_(body.senha);
+    if (!checkList.ok) return jsonOutput_(checkList);
+    return jsonOutput_({ ok: true, rows: listRows_() });
+  }
+
   if (body.action === 'updateStatus') {
-    var check = checkSenha_(body.senha);
-    if (!check.ok) return jsonOutput_(check);
+    var checkUpdate = checkSenha_(body.senha);
+    if (!checkUpdate.ok) return jsonOutput_(checkUpdate);
     return jsonOutput_(updateStatus_(body.id, body.status));
   }
 
