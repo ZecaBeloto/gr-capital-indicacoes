@@ -122,6 +122,21 @@ function escapeForSheet_(value) {
   return str;
 }
 
+function notificarPorEmail_(indicador, contatos) {
+  var destinatario = Session.getActiveUser().getEmail();
+  if (!destinatario) return;
+
+  var linhas = contatos.map(function (contato) {
+    return '- ' + contato.nome + ' — ' + contato.telefone;
+  }).join('\n');
+
+  var assunto = 'Nova indicação de ' + indicador;
+  var corpo = indicador + ' indicou ' + contatos.length + ' contato(s):\n\n' + linhas +
+    '\n\nAcesse o painel para ver detalhes e marcar como contatado.';
+
+  MailApp.sendEmail(destinatario, assunto, corpo);
+}
+
 function appendIndicacao_(indicador, contatos) {
   var sheet = getSheet_();
   var timestamp = new Date().toISOString();
@@ -201,6 +216,13 @@ function doPost(e) {
     }
 
     appendIndicacao_(indicador, contatos);
+
+    try {
+      notificarPorEmail_(indicador, contatos);
+    } catch (mailErr) {
+      Logger.log('Falha ao enviar e-mail de notificação: ' + mailErr);
+    }
+
     return jsonOutput_({ ok: true });
   }
 

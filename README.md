@@ -25,6 +25,14 @@ Nenhuma indicação fica neste repositório.
 No Apps Script, abra **Configurações do projeto > Propriedades do script** e edite
 `PAINEL_SENHA`. Não precisa reimplantar.
 
+## Notificação por e-mail
+
+Toda nova indicação envia um e-mail automático para a conta Google que fez o deploy
+do Apps Script (`Session.getActiveUser().getEmail()`), com o nome de quem indicou e
+a lista de contatos enviados. Não precisa configurar nada além do deploy inicial —
+se o envio falhar por qualquer motivo, a indicação é salva normalmente na planilha
+mesmo assim.
+
 ## Bloqueio por tentativas erradas
 
 Depois de 20 tentativas de senha incorreta, a leitura e a atualização de status ficam
